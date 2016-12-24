@@ -10,8 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import static prosta.timer.AlarmReceiver.NUMBER_OF_RINGS_KEY;
-import static prosta.timer.MainActivity.INTERVAL_PREF;
+import static prosta.timer.ForegroundTimer.NUMBER_OF_RINGS_PREF;
+import static prosta.timer.ForegroundTimer.INTERVAL_PREF;
 
 
 public class SettingsActivity extends AppCompatActivity {
@@ -68,7 +68,7 @@ public class SettingsActivity extends AppCompatActivity {
         String message = "number of rings set to: " + numberOfRingsInput;
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt(NUMBER_OF_RINGS_KEY, numberOfRingsInput);
+        editor.putInt(NUMBER_OF_RINGS_PREF, numberOfRingsInput);
         editor.commit();
         Toast.makeText(SettingsActivity.this, message, Toast.LENGTH_SHORT).show();
     }

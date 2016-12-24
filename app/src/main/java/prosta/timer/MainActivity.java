@@ -25,21 +25,14 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import static java.lang.Thread.sleep;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final String INTERVAL_PREF = "interval";
-    public static final String COUNT_DOWN_KEY = "COUNT_DOWN";
-    public static final String NUMBER_OF_RINGS_KEY = "NUMBER_OF_RINGS";
-    public static final int SECOND = 1000;
+//    public static final String NUMBER_OF_RINGS_KEY = "NUMBER_OF_RINGS";
     public static long interval;
-    public final static int MILLIS_IN_HOUR = 3600000;
-    private PendingIntent pendingIntent;
-    private AlarmManager manager;
     private PowerManager.WakeLock wakeLock;
     int ringsLeft = 0;
-    CountDownTimer countdown;
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -50,10 +43,6 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
-        // Retrieve a PendingIntent that will perform a broadcast
-        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
-        pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
@@ -141,62 +130,6 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, alarmSetMessage, Toast.LENGTH_LONG).show();
 
 
-
-
-//        Long countDownLong = interval / (3600 * 1000);
-//        countDown = countDownLong.intValue();
-//        SharedPreferences.Editor editor = sharedPref.edit();
-//        editor.putInt(COUNT_DOWN_KEY, countDown);
-
-//        long MINUTE_TO_MSEC = 60000;
-//        long DAY_TO_MSEC = MINUTE_TO_MSEC * 60 * 24;
-
-//
-//        Timer timer = new Timer();
-//        TimerTask countdownTask = new TimerTask() {
-//            public void run() {
-//        /* your function goes here */
-//                ringing();
-//            }
-//        };
-//        timer.scheduleAtFixedRate(countdownTask, 0, interval);
-
-//        final TextView title = (TextView) findViewById(R.id.textView);
-//
-//        wakeLock.acquire();
-//
-//        countdown = new CountDownTimer(interval, SECOND) {
-//
-//            public void onTick(long millisUntilFinished) {
-//                String timeLeft = "seconds remaining: " + millisUntilFinished / 1000;
-//                String minuteLeft = "minutes remaning: " + millisUntilFinished / 1000 / 60;
-//                String hourLeft = "hours remaning: " + millisUntilFinished / 1000 / 60 / 60;
-//                String message = timeLeft + "\n" + minuteLeft + "\n" + hourLeft;
-//                Log.d("time remaining", timeLeft);
-//                title.setText(message);
-//
-//            }
-//
-//            public void onFinish() {
-//                title.setText("you can eat, fat boy!");
-//                ringing();
-//                try {
-//                    sleep(5000);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                countdown.start();
-//            }
-//        }.start();
-
-
-//
-//
-
-//
-//        manager = (AlarmManager) getSystemService(this.ALARM_SERVICE);
-//        manager.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + interval, interval, pendingIntent);
-
     }
 
     public void cancelAlarm() {
@@ -213,52 +146,6 @@ public class MainActivity extends AppCompatActivity {
             Log.d("wake lock error", e.getMessage());
         }
 
-
-
-//        manager = (AlarmManager) getSystemService(this.ALARM_SERVICE);
-//        manager.cancel(pendingIntent);
-//
-
-//
-//        Toast.makeText(this, "Alarm Canceled", Toast.LENGTH_SHORT).show();
     }
 
-
-    public void ringing() {
-        final MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.bell);
-
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-
-        if (sharedPref.getInt(NUMBER_OF_RINGS_KEY, 0) == 0) {
-            ringsLeft = 3;
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putInt(NUMBER_OF_RINGS_KEY, ringsLeft);
-            editor.commit();
-        }
-
-        else {
-            ringsLeft = sharedPref.getInt(NUMBER_OF_RINGS_KEY, 0);
-        }
-
-
-        mediaPlayer.start();
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
-        {
-            @Override
-            public void onCompletion(MediaPlayer mp)
-
-            {
-                if (ringsLeft > 1) {
-                    Log.d("rings left:", String.valueOf(ringsLeft-1));
-                    mp.start();
-                    try {
-                        sleep(2500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    ringsLeft--;
-                }
-            }
-        });
-    }
 }

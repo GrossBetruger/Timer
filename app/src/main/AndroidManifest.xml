@@ -23,8 +23,6 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".AlarmReceiver" />
-
         <activity android:name=".SettingsActivity" />
         <activity android:name=".CountdownActivity" />
 

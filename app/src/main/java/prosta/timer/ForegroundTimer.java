@@ -11,10 +11,8 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.TextView;
 
 import static java.lang.Thread.sleep;
-import static prosta.timer.MainActivity.NUMBER_OF_RINGS_KEY;
 
 
 /**
@@ -28,9 +26,9 @@ public class ForegroundTimer extends Service {
     public static final String INTERVAL = "INTERVAL";
     public static final String TIME_MESSAGE = "TIME_MESSAGE";
     public static final String ACTION_SEND_TIME_MESSAGE = "SEND_TIME_MESSAGE";
+    public static final String NUMBER_OF_RINGS_PREF = "NUMBER_OF_RINGS";
+    public static final String INTERVAL_PREF = "INTERVAL";
     public static final int SECOND = 1000;
-    public static final int SLEEP_FOR_MESSAGE = 10000;
-    public static final String YOU_CAN_EAT_NOW_FAT_BOY = "you can eat now, fat boy";
     public static int ringsLeft;
     CountDownTimer countdown;
 
@@ -57,19 +55,10 @@ public class ForegroundTimer extends Service {
                 }
 
                 public void onFinish() {
-                    Log.d("onFinish", "done");
-//                    String fatBoyMessage = YOU_CAN_EAT_NOW_FAT_BOY;;
-//                    Intent intent = new Intent(ACTION_SEND_TIME_MESSAGE);
-//                    intent.putExtra(TIME_MESSAGE, fatBoyMessage);
-//                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                    ringing();
-                    Log.d("onFinish", "rang");
-                    try {
-                        sleep(SLEEP_FOR_MESSAGE);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    Log.d("onFinish", "slept");
+                    Log.d("onFinish:", "countdown done");
+
+                    ring();
+                    Log.d("onFinish:", "rang");
 
                     countdown.start();
                 }
@@ -93,41 +82,46 @@ public class ForegroundTimer extends Service {
         super.onDestroy();
     }
 
-    public void ringing() {
+    public void ring() {
         final MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.bell);
+        int duration = mediaPlayer.getDuration();
+        Log.d("audio file duration:", String.valueOf(duration));
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 
-        if (sharedPref.getInt(NUMBER_OF_RINGS_KEY, 0) == 0) {
+        if (sharedPref.getInt(NUMBER_OF_RINGS_PREF, 0) == 0) {
             ringsLeft = 3;
             SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putInt(NUMBER_OF_RINGS_KEY, ringsLeft);
+            editor.putInt(NUMBER_OF_RINGS_PREF, ringsLeft);
             editor.commit();
         }
 
         else {
-            ringsLeft = sharedPref.getInt(NUMBER_OF_RINGS_KEY, 0);
+            ringsLeft = sharedPref.getInt(NUMBER_OF_RINGS_PREF, 0);
         }
 
 
-        mediaPlayer.start();
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
-        {
+        new Thread( new Runnable() {
             @Override
-            public void onCompletion(MediaPlayer mp)
+            public void run() {
 
-            {
-                if (ringsLeft > 1) {
-                    Log.d("rings left:", String.valueOf(ringsLeft-2));
-                    mp.start();
-                    try {
-                        sleep(2500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
+                {
+                    @Override
+                    public void onCompletion(MediaPlayer mp)
+
+                    {
+                        if (ringsLeft > 1) {
+                            Log.d("rings left:", String.valueOf(ringsLeft-2));
+                            mp.start();
+                            ringsLeft--;
+                        }
                     }
-                    ringsLeft--;
-                }
+                });
             }
-        });
+        }).start();
+        mediaPlayer.start();
+
+
     }
 }
