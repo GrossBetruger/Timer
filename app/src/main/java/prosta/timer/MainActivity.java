@@ -25,11 +25,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import static prosta.timer.ForegroundTimer.INTERVAL_PREF;
+
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String INTERVAL_PREF = "interval";
-//    public static final String NUMBER_OF_RINGS_KEY = "NUMBER_OF_RINGS";
     public static long interval;
     private PowerManager.WakeLock wakeLock;
     int ringsLeft = 0;
